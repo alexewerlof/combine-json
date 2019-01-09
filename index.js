@@ -6,6 +6,7 @@ const JSON5 = require('json5')
 const aReadFile = promisify(readFile)
 const aReadDir = promisify(readdir)
 const aLStat = promisify(lstat)
+const aMap = (arr, callback) => Promise.all(arr.map((...args) => callback(...args)))
 
 function getFileNameWithoutExtension(filePath) {
     return parse(filePath).name
@@ -44,7 +45,7 @@ async function parseFile(filePath) {
 
 async function getDirContents(dirPath) {
     const allEntities = await aReadDir(dirPath)
-    const mappedEntities = await Promise.all(allEntities.map(async entity => {
+    const mappedEntities = await aMap(allEntities, async entity => {
         const path = join(dirPath, entity)
         const stat = await aLStat(join(dirPath, entity))
         if (stat.isDirectory()) {
@@ -60,20 +61,20 @@ async function getDirContents(dirPath) {
                 key: getFileNameWithoutExtension(entity)
             }
         }
-    }))
+    })
     return mappedEntities.filter(Boolean)
 }
 
 async function aggregate(pathToConfig) {
     const rootContents = await getDirContents(pathToConfig)
     const ret = representArrayIndices(rootContents) ? [] : {}
-    await Promise.all(rootContents.map(async content => {
+    await aMap(rootContents, async content => {
         if (content.isFile) {
             ret[content.key] = await parseFile(content.path)
         } else if (content.isDir) {
             ret[content.key] = await aggregate(content.path)
         }
-    }))
+    })
     return ret
 }
 
