@@ -138,6 +138,8 @@ Take a look at `test/my-data` to see it in action.
 
 * It ignores all files that don't have a `.json` extension (case insensitive)
 * For a directory to represent an array, all its contents should be consecutive numericals. Example: `./0/`, `./1/`, `./2.json`, `./3/`, ...
+* The files can contain anything that `JSON.parse()` can understand: JSON objects, strings, numbers, etc.
+* We use [JSON5](https://www.npmjs.com/package/json5) for parsing the files. This means you can have comments if you need them.
 
 # CLI
 
