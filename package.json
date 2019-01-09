@@ -2,7 +2,10 @@
   "name": "combine-json",
   "version": "0.0.1",
   "description": "Combines a group of json files and folders into an object",
-  "main": "raw.js",
+  "main": "index.js",
+  "bin" : {
+    "combine-json" : "./cli.js" 
+  },
   "scripts": {
     "test": "mocha"
   },

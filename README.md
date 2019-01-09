@@ -143,7 +143,34 @@ Take a look at `test/my-data` to see it in action.
 
 # CLI
 
-TODO
+You can use the CLI for testing what the output may look like.
+
+```text
+$ npx combine-json test/my-data/
+{
+    "address": {
+        "street": "Hittepågatan 13",
+        "city": "Stockholm",
+        "country": "Sweden",
+        "zip": "11122"
+    },
+    "name": "Alex Ewerlöf",
+    "todos": [
+        {
+            "id": 1,
+            "title": "document the module"
+        },
+        {
+            "id": 2,
+            "title": "write some tests"
+        },
+        {
+            "id": 3,
+            "title": "publish it for good"
+        }
+    ]
+}
+```
 
 ---
 

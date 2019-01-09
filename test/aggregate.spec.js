@@ -1,9 +1,9 @@
 const { expect } = require('chai')
-const { aggregate } = require('../index')
+const { combine } = require('../index')
 
-describe('aggregate()', () => {
+describe('combine()', () => {
     it('should be cool', async () => {
-        const myData = await aggregate('test/my-data')
+        const myData = await combine('test/my-data')
         expect(myData).to.deep.equal({
             "name": "Alex Ewerlöf",
                 "address": {
@@ -31,7 +31,7 @@ describe('aggregate()', () => {
 
     it('throws if the directory does not exist', async () => {
         try {
-            await aggregate('non-existing-path')
+            await combine('non-existing-path')
         } catch (err) {
             expect(err).to.be.an('error')
         }

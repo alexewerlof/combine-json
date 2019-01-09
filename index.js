@@ -61,17 +61,17 @@ async function getDirContents(dirPath) {
     return mappedEntities.filter(Boolean)
 }
 
-async function aggregate(pathToConfig) {
+async function combine(pathToConfig) {
     const contents = await getDirContents(pathToConfig)
     const ret = representArrayIndices(contents) ? [] : {}
     await asyncMap(contents, async content => {
         if (content.isFile) {
             ret[content.key] = await parseFile(content.path)
         } else if (content.isDir) {
-            ret[content.key] = await aggregate(content.path)
+            ret[content.key] = await combine(content.path)
         }
     })
     return ret
 }
 
-module.exports = { aggregate }
+module.exports = { combine }
