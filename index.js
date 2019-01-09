@@ -3,10 +3,10 @@ const { join, parse } = require('path')
 const { promisify } = require('util')
 const JSON5 = require('json5')
 
-const aReadFile = promisify(readFile)
-const aReadDir = promisify(readdir)
-const aLStat = promisify(lstat)
-const aMap = (arr, callback) => Promise.all(arr.map((...args) => callback(...args)))
+const asyncReadFile = promisify(readFile)
+const asyncReadDir = promisify(readdir)
+const asyncLStat = promisify(lstat)
+const asyncMap = (arr, callback) => Promise.all(arr.map((...args) => callback(...args)))
 
 function getFileNameWithoutExtension(filePath) {
     return parse(filePath).name
@@ -29,13 +29,9 @@ function representArrayIndices(arr) {
     }
 }
 
-async function loadText(filePath) {
-    const buff = await aReadFile(filePath)
-    return buff.toString()
-}
-
 async function parseFile(filePath) {
-    const text = await loadText(filePath)
+    const buff = await asyncReadFile(filePath)
+    const text = buff.toString()
     try {
         return JSON5.parse(text)
     } catch (json5ParseError) {
@@ -44,21 +40,21 @@ async function parseFile(filePath) {
 }
 
 async function getDirContents(dirPath) {
-    const allEntities = await aReadDir(dirPath)
-    const mappedEntities = await aMap(allEntities, async entity => {
-        const path = join(dirPath, entity)
-        const stat = await aLStat(join(dirPath, entity))
+    const dirEntities = await asyncReadDir(dirPath)
+    const mappedEntities = await asyncMap(dirEntities, async name => {
+        const path = join(dirPath, name)
+        const stat = await asyncLStat(path)
         if (stat.isDirectory()) {
             return {
                 isDir: true,
                 path,
-                key: entity,
+                key: name,
             }
         } else if (stat.isFile() && hasJsonExtension(path)) {
             return {
                 isFile: true,
                 path,
-                key: getFileNameWithoutExtension(entity)
+                key: getFileNameWithoutExtension(path)
             }
         }
     })
@@ -66,9 +62,9 @@ async function getDirContents(dirPath) {
 }
 
 async function aggregate(pathToConfig) {
-    const rootContents = await getDirContents(pathToConfig)
-    const ret = representArrayIndices(rootContents) ? [] : {}
-    await aMap(rootContents, async content => {
+    const contents = await getDirContents(pathToConfig)
+    const ret = representArrayIndices(contents) ? [] : {}
+    await asyncMap(contents, async content => {
         if (content.isFile) {
             ret[content.key] = await parseFile(content.path)
         } else if (content.isDir) {
