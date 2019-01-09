@@ -136,7 +136,11 @@ Take a look at `test/my-data` to see it in action.
 
 # Rules
 
+* It ignores all files that don't have a `.json` extension (case insensitive)
+
 # CLI
+
+TODO
 
 ---
 

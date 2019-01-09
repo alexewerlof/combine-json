@@ -1,0 +1,22 @@
+{
+  "name": "combine-json",
+  "version": "0.0.1",
+  "description": "Combines a group of json files and folders into an object",
+  "main": "raw.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "json",
+    "config",
+    "cli"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "json5": "^2.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
+  }
+}
