@@ -137,6 +137,7 @@ Take a look at `test/my-data` to see it in action.
 # Rules
 
 * It ignores all files that don't have a `.json` extension (case insensitive)
+* For a directory to represent an array, all its contents should be consecutive numericals. Example: `./0/`, `./1/`, `./2.json`, `./3/`, ...
 
 # CLI
 
