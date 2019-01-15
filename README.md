@@ -4,7 +4,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/userpixel/combine-json.svg)](https://github.com/userpixel/combine-json/issues)
 [![Version](https://img.shields.io/npm/v/combine-json.svg?style=flat-square)](http://npm.im/combine-json)
 [![Downloads](https://img.shields.io/npm/dm/combine-json.svg?style=flat-square)](http://npm-stat.com/charts.html?package=combine-json&from=2017-01-01)
-[![MIT License](https://img.shields.io/npm/l/callifexists.svg?style=flat-square)](http://opensource.org/licenses/MIT)
+[![MIT License](https://img.shields.io/npm/l/combine-json.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 
 # JSON Dir
 
