@@ -6,12 +6,11 @@
 [![Downloads](https://img.shields.io/npm/dm/combine-json.svg?style=flat-square)](http://npm-stat.com/charts.html?package=combine-json&from=2017-01-01)
 [![MIT License](https://img.shields.io/npm/l/combine-json.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 
-# JSON Dir
+# Combine-JSON
 
 This module allows you to break a JSON file to a directory structure.
 
 **Why?** Sometimes you have a huge JSON file with lots of nested objects.
-This is hard to maintain:
 
 * It is hard to browse to a particular section
 * When using a version control system (like `git`) editing any part of the file, adds to the history of the whole file
@@ -56,6 +55,8 @@ You can break it into several files like this:
 ```json
 "Alex Ewerlöf"
 ```
+
+(Yes that's a perfectly valid input to `JSON.parse()`)
 
 ##### my-data/address.js
 
@@ -140,13 +141,14 @@ my-data/
         |____2.json
 ```
 
-Take a look at `test/my-data` to see it in action.
+Take a look at the [`test/my-data`](./test/my-data) directory to see it in action.
 
 # Rules
 
 * It ignores all files that don't have a `.json` extension (case insensitive)
-* For a directory to represent an array, all its contents should be consecutive numericals. Example: `./0/`, `./1/`, `./2.json`, `./3/`, ...
-* The files can contain anything that `JSON.parse()` can understand: JSON objects, strings, numbers, etc.
+* For a directory to represent an array, all its contents should be consecutive numericals starting with `0`.
+  Example: `./0/`, `./1/`, `./2.json`, `./3/`, ...
+* The files can contain anything that `JSON.parse()` can understand: objects, arrays, strings, numbers, booleans.
 * We use [JSON5](https://www.npmjs.com/package/json5) for parsing the files. This means you can have comments if you need them.
 
 # CLI
