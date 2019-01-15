@@ -1,5 +1,7 @@
-languae: node_js
+language: node_js
 node_js:
-  - lts/*
+  - "lts/*"
   - node
+before_install:
+  - npm ci
 cache: npm
