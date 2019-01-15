@@ -149,7 +149,9 @@ Take a look at the [`test/my-data`](./test/my-data) directory to see it in actio
 * For a directory to represent an array, all its contents should be consecutive numericals starting with `0`.
   Example: `./0/`, `./1/`, `./2.json`, `./3/`, ...
 * The files can contain anything that `JSON.parse()` can understand: objects, arrays, strings, numbers, booleans.
-* We use [JSON5](https://www.npmjs.com/package/json5) for parsing the files. This means you can have comments if you need them.
+* Optionally you can use [JSON5](https://www.npmjs.com/package/json5) for parsing the files.
+  This means you can have comments and a liberal syntax.
+  You need to explicitly install the `json5` package.
 
 # Usage
 
@@ -166,13 +168,7 @@ combine('path/to/roorDir').then(
 
 # API
 
-### `async combine(path)`
-
-Looks into the path:
-* For every JSON file it finds, it creates a key with the file name (without the `.json` extension)
-  The value will be the contents of the file parsed in JSON
-* For every directory, it creates a key with the file name.
-  The value will be created by calling the `combine()` function recursively on the subdirectory.
+See the [`docs`](./docs/index.html) folder.
 
 # CLI
 

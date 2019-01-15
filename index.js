@@ -1,7 +1,6 @@
 const { readFile, readdir, lstat } = require('fs')
 const { join, parse } = require('path')
 const { promisify } = require('util')
-const JSON5 = require('json5')
 
 const asyncReadFile = promisify(readFile)
 const asyncReadDir = promisify(readdir)
@@ -29,13 +28,14 @@ function representArrayIndices(arr) {
     }
 }
 
-async function parseFile(filePath) {
+async function parseFile(filePath, useJson5) {
     const buff = await asyncReadFile(filePath)
     const text = buff.toString()
+    const { parse } = useJson5 ? require('json5') : JSON
     try {
-        return JSON5.parse(text)
+        return parse(text)
     } catch (json5ParseError) {
-        throw new Error(`Failed to parse ${filePath}: ${json5ParseError}`)
+        throw new Error(`Failed to parse ${filePath} as ${useJson5 ? 'json5' : 'JSON'}: ${json5ParseError}`)
     }
 }
 
@@ -61,14 +61,29 @@ async function getDirContents(dirPath) {
     return mappedEntities.filter(Boolean)
 }
 
-async function combine(pathToConfig) {
+/**
+ * It looks into the path:
+ * * For every JSON file it finds, it creates a key with the file name (without the `.json` extension)
+ *   The value will be the contents of the file parsed in JSON.
+ * * For every directory, it creates a key with the file name.
+ *   The value will be created by calling the `combine()` function recursively on the subdirectory.
+ * @param {string} pathToConfig - The path to a folder that contains the files and subdirectories
+ * @param {object} [options] - options for customizing the behavior of the algorithm
+ * @param {boolean} [options.json5=false] - use json5 to parse the json files
+ *        If set to `true`, make sure to install JSON5 (it is an `optionalDependency`).
+ * @param {boolean} [options.autoArray=true] - should we automatically assume that if an object only
+ *        contains consecutive numerical keys that start with zero represents an array?
+ * @throws An error if it can't access or parse a file or directory.
+ * @returns {object} A JavaScript object (or an array if that's what the data represents).
+ */
+async function combine(pathToConfig, { json5 = false, autoArray = true} = {}) {
     const contents = await getDirContents(pathToConfig)
-    const ret = representArrayIndices(contents) ? [] : {}
+    const ret = autoArray && representArrayIndices(contents) ? [] : {}
     await asyncMap(contents, async content => {
         if (content.isFile) {
-            ret[content.key] = await parseFile(content.path)
+            ret[content.key] = await parseFile(content.path, json5)
         } else if (content.isDir) {
-            ret[content.key] = await combine(content.path)
+            ret[content.key] = await combine(content.path, { json5, autoArray })
         }
     })
     return ret

@@ -7,7 +7,8 @@
     "combine-json": "./cli.js"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "docs": "jsdoc -d docs ."
   },
   "keywords": [
     "json",
@@ -15,11 +16,13 @@
     "cli"
   ],
   "license": "MIT",
-  "dependencies": {
-    "json5": "^2.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "chai": "^4.2.0",
+    "jsdoc": "^3.5.5",
     "mocha": "^5.2.0"
+  },
+  "optionalDependencies": {
+    "json5": "^2.1.0"
   }
 }
