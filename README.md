@@ -1,3 +1,11 @@
+![Combine-JSON logo](./logo.png)
+
+[![Build Status](https://travis-ci.org/userpixel/combine-json.svg?branch=master)](https://travis-ci.org/userpixel/combine-json)
+[![GitHub issues](https://img.shields.io/github/issues/userpixel/combine-json.svg)](https://github.com/userpixel/combine-json/issues)
+[![Version](https://img.shields.io/npm/v/combine-json.svg?style=flat-square)](http://npm.im/combine-json)
+[![Downloads](https://img.shields.io/npm/dm/combine-json.svg?style=flat-square)](http://npm-stat.com/charts.html?package=combine-json&from=2017-01-01)
+[![MIT License](https://img.shields.io/npm/l/callifexists.svg?style=flat-square)](http://opensource.org/licenses/MIT)
+
 # JSON Dir
 
 This module allows you to break a JSON file to a directory structure.
@@ -126,8 +134,8 @@ my-data/
     |____address.json
     |____todos/
         |____0/
-            |____id.json
-            |____title.json
+        |    |____id.json
+        |    |____title.json
         |____1.json
         |____2.json
 ```
