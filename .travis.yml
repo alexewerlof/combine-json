@@ -1,1 +1,5 @@
 languae: node_js
+node_js:
+  - lts/*
+  - node
+cache: npm
