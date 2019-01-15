@@ -151,6 +151,29 @@ Take a look at the [`test/my-data`](./test/my-data) directory to see it in actio
 * The files can contain anything that `JSON.parse()` can understand: objects, arrays, strings, numbers, booleans.
 * We use [JSON5](https://www.npmjs.com/package/json5) for parsing the files. This means you can have comments if you need them.
 
+# Usage
+
+`$ npm i combine-json`
+
+```javascript
+const { combine } = require('combine-json')
+
+combine('path/to/roorDir').then(
+    myJsonObj => console.dir(myJsonObj),
+    error => console.error(error)
+)
+```
+
+# API
+
+### `async combine(path)`
+
+Looks into the path:
+* For every JSON file it finds, it creates a key with the file name (without the `.json` extension)
+  The value will be the contents of the file parsed in JSON
+* For every directory, it creates a key with the file name.
+  The value will be created by calling the `combine()` function recursively on the subdirectory.
+
 # CLI
 
 You can use the CLI for testing what the output may look like.
