@@ -37,7 +37,11 @@ describe('combine()', () => {
         }
     })
 
-    it('throws if both a directory and a JSON file with the same name', () => {
-        // TODO write me
+    it('throws if both a directory and a JSON file with the same name', async () => {
+        try {
+            await combine('test/dir-and-json', { json5: true})
+        } catch (err) {
+            expect(err).to.be.an('error')
+        }
     })
 })
