@@ -58,7 +58,7 @@ You can break it into several files like this:
 
 (Yes that's a perfectly valid input to `JSON.parse()`)
 
-##### my-data/address.js
+##### my-data/address.json
 
 ```json
 {
@@ -69,7 +69,7 @@ You can break it into several files like this:
 }
 ```
 
-##### my-data/todos.js
+##### my-data/todos.json
 
 ```json
 [
@@ -90,7 +90,7 @@ You can break it into several files like this:
 
 You can write that array of objects into files as well:
 
-##### my-data/todos/0.js
+##### my-data/todos/0.json
 
 ```json
 {
@@ -98,7 +98,7 @@ You can write that array of objects into files as well:
     "title": "document the module",
 }
 ```
-##### my-data/todos/1.js
+##### my-data/todos/1.json
 
 ```json
 {
@@ -106,7 +106,7 @@ You can write that array of objects into files as well:
     "title": "write some tests",
 }
 ```
-##### my-data/todos/2.js
+##### my-data/todos/2.json
 
 ```json
 {
