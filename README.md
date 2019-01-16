@@ -174,7 +174,7 @@ See the [`docs`](./docs/index.html) folder.
 
 You can use the CLI for testing what the output may look like.
 
-```text
+```json
 $ npx combine-json test/my-data/
 {
     "address": {
