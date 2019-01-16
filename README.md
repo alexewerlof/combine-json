@@ -168,7 +168,7 @@ combine('path/to/roorDir').then(
 
 # API
 
-See the [`docs`](./docs/index.html) folder.
+See the [js docs](https://userpixel.github.io/combine-json/) online.
 
 # CLI
 
