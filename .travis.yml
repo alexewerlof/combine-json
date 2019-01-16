@@ -2,6 +2,17 @@ language: node_js
 node_js:
   - "lts/*"
   - node
+cache: npm
 before_install:
   - npm ci
-cache: npm
+script:
+  - npm t
+after_success:
+  - npm run docs
+deploy:
+  provider: pages
+  skip-cleanup: true
+  local-dir: docs
+  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  on:
+    branch: master
