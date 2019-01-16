@@ -1,6 +1,6 @@
 {
   "name": "combine-json",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Combines a group of json files and folders into an object",
   "main": "index.js",
   "bin": {
