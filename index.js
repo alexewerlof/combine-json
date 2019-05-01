@@ -38,7 +38,7 @@ async function parseFile(filePath, parser) {
     }
 }
 
-async function getDirContents(dirPath) {
+async function getDirEntities(dirPath) {
     const dirEntities = await asyncReadDir(dirPath)
     const mappedEntities = await asyncMap(dirEntities, async name => {
         const path = join(dirPath, name)
@@ -75,13 +75,13 @@ async function getDirContents(dirPath) {
  * @returns {object} A JavaScript object (or an array if that's what the data represents).
  */
 async function combine(pathToConfig, { parser = JSON.parse, autoArray = true} = {}) {
-    const contents = await getDirContents(pathToConfig)
-    const ret = autoArray && representArrayIndices(contents) ? [] : {}
-    await asyncMap(contents, async content => {
-        if (content.isFile) {
-            ret[content.key] = await parseFile(content.path, parser)
-        } else if (content.isDir) {
-            ret[content.key] = await combine(content.path, { parser, autoArray })
+    const entities = await getDirEntities(pathToConfig)
+    const ret = autoArray && representArrayIndices(entities) ? [] : {}
+    await asyncMap(entities, async entity => {
+        if (entity.isFile) {
+            ret[entity.key] = await parseFile(entity.path, parser)
+        } else if (entity.isDir) {
+            ret[entity.key] = await combine(entity.path, { parser, autoArray })
         }
     })
     return ret
