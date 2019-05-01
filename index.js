@@ -80,7 +80,7 @@ async function getDirEntities(dirPath, accept) {
  * @returns {object} A JavaScript object (or an array if that's what the data represents).
  */
 async function combine(pathToConfig, options = {}) {
-    const { parser = JSON.parse, autoArray = true, accept = '.json'}
+    const { parser = JSON.parse, autoArray = true, accept = '.json'} = options
     const entities = await getDirEntities(pathToConfig, accept)
     const ret = autoArray && representArrayIndices(entities) ? [] : {}
     await asyncMap(entities, async entity => {
