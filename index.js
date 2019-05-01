@@ -28,12 +28,11 @@ function representArrayIndices(arr) {
     }
 }
 
-async function parseFile(filePath, useJson5) {
+async function parseFile(filePath, parser) {
     const buff = await asyncReadFile(filePath)
     const text = buff.toString()
-    const { parse } = useJson5 ? require('json5') : JSON
     try {
-        return parse(text)
+        return parser(text)
     } catch (json5ParseError) {
         throw new Error(`Failed to parse ${filePath} as ${useJson5 ? 'json5' : 'JSON'}: ${json5ParseError}`)
     }
@@ -69,21 +68,20 @@ async function getDirContents(dirPath) {
  *   The value will be created by calling the `combine()` function recursively on the subdirectory.
  * @param {string} pathToConfig - The path to a folder that contains the files and subdirectories
  * @param {object} [options] - options for customizing the behavior of the algorithm
- * @param {boolean} [options.json5=false] - use json5 to parse the json files
- *        If set to `true`, make sure to install JSON5 (it is an `optionalDependency`).
+ * @param {function} [options.parser=JSON.parse] - use a custom parser. If you want to use JSON5 pass JSON5.parse
  * @param {boolean} [options.autoArray=true] - should we automatically assume that if an object only
  *        contains consecutive numerical keys that start with zero represents an array?
  * @throws An error if it can't access or parse a file or directory.
  * @returns {object} A JavaScript object (or an array if that's what the data represents).
  */
-async function combine(pathToConfig, { json5 = false, autoArray = true} = {}) {
+async function combine(pathToConfig, { parser = JSON.parse, autoArray = true} = {}) {
     const contents = await getDirContents(pathToConfig)
     const ret = autoArray && representArrayIndices(contents) ? [] : {}
     await asyncMap(contents, async content => {
         if (content.isFile) {
-            ret[content.key] = await parseFile(content.path, json5)
+            ret[content.key] = await parseFile(content.path, parser)
         } else if (content.isDir) {
-            ret[content.key] = await combine(content.path, { json5, autoArray })
+            ret[content.key] = await combine(content.path, { parser, autoArray })
         }
     })
     return ret
