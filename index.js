@@ -15,8 +15,11 @@ function getFileExtension(filePath) {
     return parse(filePath).ext
 }
 
-function hasJsonExtension(filePath) {
-    return /\.json/i.test(getFileExtension(filePath))
+function isAcceptableFile(accept, filePath) {
+    if (typeof accept === 'string') {
+        return getFileExtension(filePath).toUpperCase() === accept.toUpperCase()
+    }
+    return accept(filePath)
 }
 
 function representArrayIndices(arr) {
@@ -33,12 +36,12 @@ async function parseFile(filePath, parser) {
     const text = buff.toString()
     try {
         return parser(text)
-    } catch (json5ParseError) {
-        throw new Error(`Failed to parse ${filePath} as ${useJson5 ? 'json5' : 'JSON'}: ${json5ParseError}`)
+    } catch (parseError) {
+        throw new Error(`Failed to parse ${filePath}. Error: ${parseError}`)
     }
 }
 
-async function getDirEntities(dirPath) {
+async function getDirEntities(dirPath, accept) {
     const dirEntities = await asyncReadDir(dirPath)
     const mappedEntities = await asyncMap(dirEntities, async name => {
         const path = join(dirPath, name)
@@ -49,7 +52,7 @@ async function getDirEntities(dirPath) {
                 path,
                 key: name,
             }
-        } else if (stat.isFile() && hasJsonExtension(path)) {
+        } else if (stat.isFile() && isAcceptableFile(accept, path)) {
             return {
                 isFile: true,
                 path,
@@ -68,14 +71,16 @@ async function getDirEntities(dirPath) {
  *   The value will be created by calling the `combine()` function recursively on the subdirectory.
  * @param {string} pathToConfig - The path to a folder that contains the files and subdirectories
  * @param {object} [options] - options for customizing the behavior of the algorithm
+ * @param {string|function} [options.accept='.json'] - the file extension to accept (including the dot prefix).
+ * You can also pass a function that receives the file name and returns a truthy value if it is acceptable.
  * @param {function} [options.parser=JSON.parse] - use a custom parser. If you want to use JSON5 pass JSON5.parse
  * @param {boolean} [options.autoArray=true] - should we automatically assume that if an object only
  *        contains consecutive numerical keys that start with zero represents an array?
  * @throws An error if it can't access or parse a file or directory.
  * @returns {object} A JavaScript object (or an array if that's what the data represents).
  */
-async function combine(pathToConfig, { parser = JSON.parse, autoArray = true} = {}) {
-    const entities = await getDirEntities(pathToConfig)
+async function combine(pathToConfig, { parser = JSON.parse, autoArray = true, accept = '.json'} = {}) {
+    const entities = await getDirEntities(pathToConfig, accept)
     const ret = autoArray && representArrayIndices(entities) ? [] : {}
     await asyncMap(entities, async entity => {
         if (entity.isFile) {
