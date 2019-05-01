@@ -16,7 +16,7 @@ function getFileExtension(filePath) {
 }
 
 function hasJsonExtension(filePath) {
-    return /.json/i.test(getFileExtension(filePath))
+    return /\.json/i.test(getFileExtension(filePath))
 }
 
 function representArrayIndices(arr) {
