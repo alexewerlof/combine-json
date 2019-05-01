@@ -46,18 +46,24 @@ async function getDirEntities(dirPath, accept) {
     const mappedEntities = await asyncMap(dirEntities, async name => {
         const path = join(dirPath, name)
         const stat = await asyncLStat(path)
-        if (stat.isDirectory()) {
-            return {
-                isDir: true,
-                path,
-                key: name,
+        const isFile = stat.isFile()
+        if (!isFile && !stat.isDirectory()) {
+            return
+        }
+        let key
+        if (isFile) {
+            if (isAcceptableFile(accept, path)) {
+                key = getFileNameWithoutExtension(path)
+            } else {
+                return
             }
-        } else if (stat.isFile() && isAcceptableFile(accept, path)) {
-            return {
-                isFile: true,
-                path,
-                key: getFileNameWithoutExtension(path)
-            }
+        } else {
+            key = name
+        }
+        return {
+            isFile,
+            path,
+            key
         }
     })
     return mappedEntities.filter(Boolean)
@@ -84,11 +90,7 @@ async function combine(pathToConfig, options = {}) {
     const entities = await getDirEntities(pathToConfig, accept)
     const ret = autoArray && representArrayIndices(entities) ? [] : {}
     await asyncMap(entities, async entity => {
-        if (entity.isFile) {
-            ret[entity.key] = await parseFile(entity.path, parser)
-        } else if (entity.isDir) {
-            ret[entity.key] = await combine(entity.path, options)
-        }
+        ret[entity.key] = entity.isFile ? await parseFile(entity.path, parser) : await combine(entity.path, options)
     })
     return ret
 }

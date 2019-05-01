@@ -3,7 +3,7 @@ const { combine } = require('../index')
 const JSON5 = require('json5')
 
 describe('combine()', () => {
-    it('should be cool', async () => {
+    it('can parse a basic folder', async () => {
         const myData = await combine('test/my-data', { parser: JSON5.parse})
         expect(myData).to.deep.equal({
             "name": "Alex Ewerlöf",
