@@ -167,6 +167,10 @@ const myBigJsonObject = await combine('path/to/roorDir')
 
 See the [js docs](https://userpixel.github.io/combine-json/) online.
 
+## Known limitations
+
+Your directory names cannot contain the dot (`.`) character.
+
 # CLI
 
 You can use the CLI for testing what the output may look like.

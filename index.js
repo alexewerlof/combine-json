@@ -15,11 +15,21 @@ function getFileExtension(filePath) {
     return parse(filePath).ext
 }
 
-function isAcceptableFile(accept, filePath) {
-    if (typeof accept === 'string') {
-        return getFileExtension(filePath).toUpperCase() === accept.toUpperCase()
+function strEqualCaseInsensitive(s1, s2) {
+    return typeof s1 === 'string' && typeof s2 === 'string' && s1.toUpperCase() === s2.toUpperCase()
+}
+
+async function shouldProcess(path, accept, isFile) {
+    if (typeof accept === 'function') {
+        return await accept(path, isFile)
     }
-    return accept(filePath)
+    if (!isFile) {
+        return true
+    }
+    if (typeof accept !== 'string') {
+        throw new TypeError(`invalid 'accept' parameter: ${accept}`)
+    }
+    return strEqualCaseInsensitive(getFileExtension(path), accept)
 }
 
 function representArrayIndices(arr) {
@@ -50,24 +60,24 @@ async function getDirEntities(dirPath, accept) {
         if (!isFile && !stat.isDirectory()) {
             return
         }
-        let key
-        if (isFile) {
-            if (isAcceptableFile(accept, path)) {
-                key = getFileNameWithoutExtension(path)
-            } else {
-                return
+        if (await shouldProcess(path, accept, isFile)) {
+            return {
+                isFile,
+                path,
+                key: parse(path).name
             }
-        } else {
-            key = name
-        }
-        return {
-            isFile,
-            path,
-            key
         }
     })
     return mappedEntities.filter(Boolean)
 }
+
+/**
+ * This callback decides if a file or directory should be included in the final output or not
+ * @callback acceptCallback
+ * @param {string} path - path to a file or directory being processed
+ * @param {boolean} responseMessage - a flag indicating if it is a file or directory
+ * @return {boolean} whether we should include this file/dir in the process or not
+ */
 
 /**
  * It looks into the path:
@@ -77,8 +87,8 @@ async function getDirEntities(dirPath, accept) {
  *   The value will be created by calling the `combine()` function recursively on the subdirectory.
  * @param {string} pathToConfig - The path to a folder that contains the files and subdirectories
  * @param {object} [options] - options for customizing the behavior of the algorithm
- * @param {string|function} [options.accept='.json'] - the file extension to accept (including the dot prefix).
- * You can also pass a function that receives the file name and returns a truthy value if it is acceptable.
+ * @param {string|acceptCallback} [options.accept='.json'] - the file extension to accept (including the dot prefix).
+ * You can also pass a function that returns a truthy value if it is acceptable.
  * @param {function} [options.parser=JSON.parse] - use a custom parser. If you want to use JSON5 pass JSON5.parse
  * @param {boolean} [options.autoArray=true] - should we automatically assume that if an object only
  *        contains consecutive numerical keys that start with zero represents an array?
