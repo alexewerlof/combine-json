@@ -1,64 +1,38 @@
 const { readFile, readdir, lstat } = require('fs')
-const { join, parse } = require('path')
+const { join, parse, sep } = require('path')
 const { promisify } = require('util')
+const glob = require('glob')
+const set = require('lodash.set')
 
 const asyncReadFile = promisify(readFile)
-const asyncReadDir = promisify(readdir)
-const asyncLStat = promisify(lstat)
+const asyncGlob = promisify(glob)
 const asyncMap = (arr, callback) => Promise.all(arr.map((...args) => callback(...args)))
 
-function getFileNameWithoutExtension(filePath) {
-    return parse(filePath).name
-}
-
-function getFileExtension(filePath) {
-    return parse(filePath).ext
-}
-
-function hasJsonExtension(filePath) {
-    return /.json/i.test(getFileExtension(filePath))
-}
-
-function representArrayIndices(arr) {
-    try {
-        const indices = arr.map(a => a.key).map(Number).sort()
-        return indices.every((n, i) => n === i)
-    } catch {
-        return false
-    }
-}
-
-async function parseFile(filePath, useJson5) {
+async function parseFile(filePath, parser = JSON.parse) {
     const buff = await asyncReadFile(filePath)
     const text = buff.toString()
-    const { parse } = useJson5 ? require('json5') : JSON
     try {
-        return parse(text)
-    } catch (json5ParseError) {
-        throw new Error(`Failed to parse ${filePath} as ${useJson5 ? 'json5' : 'JSON'}: ${json5ParseError}`)
+        return parser(text)
+    } catch (parseError) {
+        throw new Error(`Failed to parse ${filePath}. Error: ${parseError}`)
     }
 }
 
-async function getDirContents(dirPath) {
-    const dirEntities = await asyncReadDir(dirPath)
-    const mappedEntities = await asyncMap(dirEntities, async name => {
-        const path = join(dirPath, name)
-        const stat = await asyncLStat(path)
-        if (stat.isDirectory()) {
-            return {
-                isDir: true,
-                path,
-                key: name,
-            }
-        } else if (stat.isFile() && hasJsonExtension(path)) {
-            return {
-                isFile: true,
-                path,
-                key: getFileNameWithoutExtension(path)
-            }
-        }
-    })
-    return mappedEntities.filter(Boolean)
+function getKey(path) {
+    const parts = path.split(sep)
+    if (parts.length) {
+        const fileName = parts[parts.length - 1]
+        parts[parts.length - 1] = parse(fileName).name
+    }
+    return parts
+}
+
+async function processMatch(result, root, filePath, parser) {
+    const fullPath = join(root, filePath)
+    const what = await parseFile(fullPath, parser) 
+    const where = getKey(filePath)
+    set(result, where, what)
+    return result
 }
 
 /**
@@ -67,26 +41,34 @@ async function getDirContents(dirPath) {
  *   The value will be the contents of the file parsed in JSON.
  * * For every directory, it creates a key with the file name.
  *   The value will be created by calling the `combine()` function recursively on the subdirectory.
- * @param {string} pathToConfig - The path to a folder that contains the files and subdirectories
+ * @param {string} root - The path to a folder that contains the files and subdirectories
  * @param {object} [options] - options for customizing the behavior of the algorithm
- * @param {boolean} [options.json5=false] - use json5 to parse the json files
- *        If set to `true`, make sure to install JSON5 (it is an `optionalDependency`).
- * @param {boolean} [options.autoArray=true] - should we automatically assume that if an object only
- *        contains consecutive numerical keys that start with zero represents an array?
+ * @param {function} [options.parser=JSON.parse] - a custom parser that receives the contents of the
+ * file as the only argument and returns the parsed value.
+ * The `parser` function can even be `async` (returning a promise)
+ * @example If you want to use `json5` pass `JSON5.parse`.
+ * @example If you use `js-yaml`, pass `jsYaml.safeLoad`.
+ * @example If you use `ini`, pass `ini.parse`.
+ * @param {string} [options.include='*.json'] - a glob pattern for what to include
+ * @param {string} [options.exclude] - a glob pattern for what to exclude
  * @throws An error if it can't access or parse a file or directory.
  * @returns {object} A JavaScript object (or an array if that's what the data represents).
  */
-async function combine(pathToConfig, { json5 = false, autoArray = true} = {}) {
-    const contents = await getDirContents(pathToConfig)
-    const ret = autoArray && representArrayIndices(contents) ? [] : {}
-    await asyncMap(contents, async content => {
-        if (content.isFile) {
-            ret[content.key] = await parseFile(content.path, json5)
-        } else if (content.isDir) {
-            ret[content.key] = await combine(content.path, { json5, autoArray })
-        }
+async function combine(root, options = {}) {
+    const { parser, include = '*.json', exclude } = options
+    const matches = await asyncGlob(include, {
+        // glob options: https://www.npmjs.com/package/glob#options
+        ignore: exclude,
+        cwd: root,
+        mark: true,
+        nocase: true,
+        nodir: true,
+        matchBase: true
     })
-    return ret
+    const result = {}
+    await asyncMap(matches, filePath => processMatch(result, root, filePath, parser))
+
+    return result
 }
 
-module.exports = { combine }
+module.exports = { combine, _test: { getKey, processMatch } }

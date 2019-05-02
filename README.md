@@ -8,13 +8,14 @@
 
 # Combine-JSON
 
-This module allows you to break a JSON file to a directory structure.
+This module (and CLI) allows you to create one JSON file from smaller files stored in a directory hierarchy.
+The smaller files can be in JSON (default) or any other format like JSON5 or YAML or even INI (custom parser).
 
-**Why?** Sometimes you have a huge JSON file with lots of nested objects.
+**Why?** Sometimes you have a huge JSON file with lots of nested objects but you want to break it into a file hierarchy because:
 
-* It is hard to browse to a particular section
-* When using a version control system (like `git`) editing any part of the file, adds to the history of the whole file
-* It is hard to understand the shape of the data structure at a glance
+* It is easier to browse to a particular section
+* It is easier to understand the shape of the data structure at a glance
+* Editing any subparts of the document leads to cleaner individual git history and diffs
 
 ### Example
 
@@ -48,7 +49,7 @@ Given this JSON file:
 }
 ```
 
-You can break it into several files like this:
+We can break it into several files like this:
 
 ##### my-data/name.json
 
@@ -143,16 +144,6 @@ my-data/
 
 Take a look at the [`test/my-data`](./test/my-data) directory to see it in action.
 
-# Rules
-
-* It ignores all files that don't have a `.json` extension (case insensitive)
-* For a directory to represent an array, all its contents should be consecutive numericals starting with `0`.
-  Example: `./0/`, `./1/`, `./2.json`, `./3/`, ...
-* The files can contain anything that `JSON.parse()` can understand: objects, arrays, strings, numbers, booleans.
-* Optionally you can use [JSON5](https://www.npmjs.com/package/json5) for parsing the files.
-  This means you can have comments and a liberal syntax.
-  You need to explicitly install the `json5` package.
-
 # Usage
 
 `$ npm i combine-json`
@@ -160,15 +151,17 @@ Take a look at the [`test/my-data`](./test/my-data) directory to see it in actio
 ```javascript
 const { combine } = require('combine-json')
 
-combine('path/to/roorDir').then(
-    myJsonObj => console.dir(myJsonObj),
-    error => console.error(error)
-)
+const myBigJsonObject = await combine('path/to/the/root/dir')
 ```
 
 # API
 
 See the [js docs](https://userpixel.github.io/combine-json/) online.
+
+## Known limitations
+
+* In the current implementation we ignore any directory starting with `.`.
+* If a folder contains subfolders or files that look like numbers, an array will be created instead of an object.
 
 # CLI
 
