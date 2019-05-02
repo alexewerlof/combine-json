@@ -8,13 +8,14 @@
 
 # Combine-JSON
 
-This module allows you to create one JSON file from smaller JSON files stored in a directory hierarchy.
+This module (and CLI) allows you to create one JSON file from smaller files stored in a directory hierarchy.
+The smaller files can be in JSON (default) or any other format like JSON5 or YAML or even INI (custom parser).
 
-**Why?** Sometimes you have a huge JSON file with lots of nested objects and it helps breaking it into a file hierarchy because:
+**Why?** Sometimes you have a huge JSON file with lots of nested objects but you want to break it into a file hierarchy because:
 
-* It is easier to browse a particular section
-* When using a version control system (like `git`) editing any subparts of the document, get their own log rather than getting lost in the log for the bigger file
+* It is easier to browse to a particular section
 * It is easier to understand the shape of the data structure at a glance
+* Editing any subparts of the document leads to cleaner individual git history and diffs
 
 ### Example
 
@@ -143,16 +144,6 @@ my-data/
 
 Take a look at the [`test/my-data`](./test/my-data) directory to see it in action.
 
-# Rules
-
-* It ignores all files that don't have a `.json` extension (case insensitive)
-* For a directory to represent an array, all its contents should be consecutive numbers starting with `0`.
-  Example: `./0/`, `./1/`, `./2.json`, `./3/`, ...
-* The files can contain anything that `JSON.parse()` can understand: objects, arrays, strings, numbers and booleans.
-* Optionally you can use [JSON5](https://www.npmjs.com/package/json5) for parsing the files.
-  This means you can have comments and a liberal syntax.
-  You need to explicitly install the `json5` package.
-
 # Usage
 
 `$ npm i combine-json`
@@ -160,7 +151,7 @@ Take a look at the [`test/my-data`](./test/my-data) directory to see it in actio
 ```javascript
 const { combine } = require('combine-json')
 
-const myBigJsonObject = await combine('path/to/roorDir')
+const myBigJsonObject = await combine('path/to/the/root/dir')
 ```
 
 # API
@@ -169,7 +160,8 @@ See the [js docs](https://userpixel.github.io/combine-json/) online.
 
 ## Known limitations
 
-Your directory names cannot contain the dot (`.`) character.
+* In the current implementation we ignore any directory starting with `.`.
+* If a folder contains subfolders or files that look like numbers, an array will be created instead of an object.
 
 # CLI
 

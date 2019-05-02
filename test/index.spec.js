@@ -1,10 +1,9 @@
 const { expect } = require('chai')
 const { combine } = require('../index')
-const JSON5 = require('json5')
 
 describe('combine()', () => {
     it('can parse a basic folder', async () => {
-        const myData = await combine('test/my-data', { parser: JSON5.parse})
+        const myData = await combine('test/my-data')
         expect(myData).to.deep.equal({
             "name": "Alex Ewerlöf",
                 "address": {
@@ -32,15 +31,15 @@ describe('combine()', () => {
 
     it('throws if the directory does not exist', async () => {
         try {
-            await combine('non-existing-path', { parser: JSON5.parse})
+            await combine('non-existing-path')
         } catch (err) {
             expect(err).to.be.an('error')
         }
     })
 
-    it('throws if both a directory and a JSON file with the same name', async () => {
+    it('throws if both a directory and a JSON file with the same name exist', async () => {
         try {
-            await combine('test/dir-and-json', { parser: JSON5.parse})
+            await combine('test/dir-and-json')
         } catch (err) {
             expect(err).to.be.an('error')
         }
