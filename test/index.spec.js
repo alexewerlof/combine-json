@@ -1,5 +1,6 @@
 const { expect } = require('chai')
 const yaml = require('js-yaml')
+const ini = require('ini')
 const { combine } = require('../index')
 
 describe('combine()', () => {
@@ -7,7 +8,7 @@ describe('combine()', () => {
         const myData = await combine('test/my-data')
         expect(myData).to.deep.equal({
             "name": "Alex Ewerlöf",
-                "address": {
+            "address": {
                 "street": "Hittepågatan 13",
                 "city": "Stockholm",
                 "country": "Sweden",
@@ -50,7 +51,7 @@ describe('combine()', () => {
         const myData = await combine('test/my-data-yaml', { include: '*.yaml', parser: yaml.safeLoad })
         expect(myData).to.deep.equal({
             "name": "Alex Ewerlöf",
-                "address": {
+            "address": {
                 "street": "Hittepågatan 13",
                 "city": "Stockholm",
                 "country": "Sweden",
@@ -67,6 +68,32 @@ describe('combine()', () => {
                 },
                 {
                     "id": 3,
+                    "title": "publish it for good",
+                }
+            ]
+        });
+    })
+
+    it('supports custom parser (ini)', async () => {
+        const myData = await combine('test/my-data-ini', { include: '*.ini', parser: ini.parse })
+        expect(myData).to.deep.equal({
+            "address": {
+                "street": "Hittepågatan 13",
+                "city": "Stockholm",
+                "country": "Sweden",
+                "zip": "11122"
+            },
+            "todos": [
+                {
+                    "id": "1",
+                    "title": "document the module",
+                },
+                {
+                    "id": "2",
+                    "title": "write some tests",
+                },
+                {
+                    "id": "3",
                     "title": "publish it for good",
                 }
             ]
