@@ -43,10 +43,12 @@ async function processMatch(result, root, filePath, parser) {
  *   The value will be created by calling the `combine()` function recursively on the subdirectory.
  * @param {string} root - The path to a folder that contains the files and subdirectories
  * @param {object} [options] - options for customizing the behavior of the algorithm
- * @param {function} [options.parser=JSON.parse] - use a custom parser.
- * If you want to use `json5` pass `JSON5.parse`.
- * If you use `js-yaml`, pass `jsYaml.safeLoad`.
+ * @param {function} [options.parser=JSON.parse] - a custom parser that receives the contents of the
+ * file as the only argument and returns the parsed value.
  * The `parser` function can even be `async` (returning a promise)
+ * @example If you want to use `json5` pass `JSON5.parse`.
+ * @example If you use `js-yaml`, pass `jsYaml.safeLoad`.
+ * @example If you use `ini`, pass `ini.parse`.
  * @param {string} [options.include='*.json'] - a glob pattern for what to include
  * @param {string} [options.exclude] - a glob pattern for what to exclude
  * @throws An error if it can't access or parse a file or directory.
@@ -54,12 +56,6 @@ async function processMatch(result, root, filePath, parser) {
  */
 async function combine(root, options = {}) {
     const { parser, include = '*.json', exclude } = options
-    // const entities = await getDirEntities(pathToConfig, accept)
-    // const ret = autoArray && representArrayIndices(entities) ? [] : {}
-    // await asyncMap(entities, async entity => {
-    //     ret[entity.key] = entity.isFile ? await parseFile(entity.path, parser) : await combine(entity.path, options)
-    // })
-    // return ret
     const matches = await asyncGlob(include, {
         // glob options: https://www.npmjs.com/package/glob#options
         ignore: exclude,
