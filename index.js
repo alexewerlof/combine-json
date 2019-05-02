@@ -43,7 +43,10 @@ async function processMatch(result, root, filePath, parser) {
  *   The value will be created by calling the `combine()` function recursively on the subdirectory.
  * @param {string} root - The path to a folder that contains the files and subdirectories
  * @param {object} [options] - options for customizing the behavior of the algorithm
- * @param {function} [options.parser=JSON.parse] - use a custom parser. If you want to use JSON5 pass JSON5.parse
+ * @param {function} [options.parser=JSON.parse] - use a custom parser.
+ * If you want to use `json5` pass `JSON5.parse`.
+ * If you use `js-yaml`, pass `jsYaml.safeLoad`.
+ * The `parser` function can even be `async` (returning a promise)
  * @param {string} [options.include='*.json'] - a glob pattern for what to include
  * @param {string} [options.exclude] - a glob pattern for what to exclude
  * @throws An error if it can't access or parse a file or directory.

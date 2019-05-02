@@ -1,4 +1,5 @@
 const { expect } = require('chai')
+const yaml = require('js-yaml')
 const { combine } = require('../index')
 
 describe('combine()', () => {
@@ -43,5 +44,32 @@ describe('combine()', () => {
         } catch (err) {
             expect(err).to.be.an('error')
         }
+    })
+
+    it('supports custom parser (yaml)', async () => {
+        const myData = await combine('test/my-data-yaml', { include: '*.yaml', parser: yaml.safeLoad })
+        expect(myData).to.deep.equal({
+            "name": "Alex Ewerlöf",
+                "address": {
+                "street": "Hittepågatan 13",
+                "city": "Stockholm",
+                "country": "Sweden",
+                "zip": "11122"
+            },
+            "todos": [
+                {
+                    "id": 1,
+                    "title": "document the module",
+                },
+                {
+                    "id": 2,
+                    "title": "write some tests",
+                },
+                {
+                    "id": 3,
+                    "title": "publish it for good",
+                }
+            ]
+        });
     })
 })
