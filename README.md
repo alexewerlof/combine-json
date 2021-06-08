@@ -26,7 +26,7 @@ Given this JSON file:
 ```json
 {
     "name": "Alex Ewerlöf",
-        "address": {
+    "address": {
         "street": "Hittepågatan 13",
         "city": "Stockholm",
         "country": "Sweden",
