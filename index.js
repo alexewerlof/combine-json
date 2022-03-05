@@ -1,4 +1,4 @@
-const { readFile, readdir, lstat } = require('fs')
+const { readFile, readdir, lstat } = require('graceful-fs') //This library avoids errors like EMFILE: too many open files, in folders with many files
 const { join, parse, sep } = require('path')
 const { promisify } = require('util')
 const glob = require('glob')
